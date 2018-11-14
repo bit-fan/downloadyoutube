@@ -124,7 +124,19 @@ function run() {
     } else {
       buffer=createHiddenElem('pre', DEBUG_ID+'2');
     }    
-    injectScript ('document.getElementById("'+DEBUG_ID+'2").appendChild(document.createTextNode(\'"video_id":"\'+ytplayer.config.args.video_id+\'", "js":"\'+ytplayer.config.assets.js+\'", "dashmpd":"\'+ytplayer.config.args.dashmpd+\'", "url_encoded_fmt_stream_map":"\'+ytplayer.config.args.url_encoded_fmt_stream_map+\'", "adaptive_fmts":"\'+ytplayer.config.args.adaptive_fmts+\'"\'));');
+    // use comma spliter to shorten the syntax, maybe easier to maintain the key val pairs.
+    let paraStr=[
+      'video_id,ytplayer.config.args.video_id',
+      'js,ytplayer.config.assets.js',
+      'dashmpd,ytplayer.config.args.dashmpd', 
+      'url_encoded_fmt_stream_map,ytplayer.config.args.url_encoded_fmt_stream_map', 
+      'adaptive_fmts,ytplayer.config.args.adaptive_fmts'
+    ].map(str=>{
+        const arr=str.split(',');
+        return `"${arr[0]}":"\'+${arr[1]}+\'"`
+    }).join(', ');
+
+    injectScript('if(ytplayer&&ytplayer.config&&ytplayer.config.args){document.getElementById("' + DEBUG_ID + '2").appendChild(document.createTextNode(\''+paraStr+'\'));}');
     var code=buffer.innerHTML;
     if (code) {
       videoID=findMatch(code, /\"video_id\":\s*\"([^\"]+)\"/);
